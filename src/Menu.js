@@ -1,3 +1,5 @@
+import StylesHelper from "./MenuStylesHelper.js";
+
 export default function Menu(items,container,eventName=null) {
     this.panel = null;
     this.container = container;
@@ -10,7 +12,7 @@ export default function Menu(items,container,eventName=null) {
     this.maxImageHeight = 0;
 
     this.init = () => {
-        this.panel = document.createElement("div");
+        Object.assign(this,new StylesHelper(this));
         this.drawItems();
         this.container.addEventListener(this.eventName, (event) => {
             event.preventDefault();
@@ -26,12 +28,14 @@ export default function Menu(items,container,eventName=null) {
                 this.hide();
             }
         })
-        document.body.appendChild(this.panel);
         return this;
     }
 
     this.drawItems = () => {
-        this.panel.innerHTML = "";
+        try {
+            document.body.removeChild(this.panel);
+        } catch (err) {}
+        this.panel = document.createElement("div");
         for (let item of this.items) {
             const div = document.createElement("div");
             div.id = item.id;
@@ -40,12 +44,15 @@ export default function Menu(items,container,eventName=null) {
             span.innerHTML = item.title;
             div.appendChild(span);
             this.panel.appendChild(div);
+            document.body.appendChild(this.panel);
         }
+        this.setStyles();
         this.drawImages();
         setTimeout(() => {
             this.adjustImagesWidth(this.maxImageHeight);
+            this.setStyles();
             this.panel.style.display = 'none';
-        },100);
+        },10);
     }
 
     this.drawImages = () => {
@@ -108,6 +115,8 @@ export default function Menu(items,container,eventName=null) {
         this.items.splice(this.items.findIndex(item => item.id === id),1);
         this.drawItems();
     }
+
+
 
     this.findItemById = (id) => Array.from(this.panel.querySelectorAll("div")).find(item => item.id === id);
 }
