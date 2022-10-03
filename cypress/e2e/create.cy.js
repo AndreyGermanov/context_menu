@@ -28,7 +28,7 @@ describe('Menus in basic mode tests', () => {
         assert.equal(menu.eventName,"contextmenu","Default trigger event should be right mouse click");
         menu.items[1].image = "http://localhost:5173:/tests/about.jpg";
         menu.drawItems();
-        assert.isDefined(Cypress.$("#add_point > img"),"Should append <img> element when 'image' property of item specified");
+        assert.isDefined(Cypress.$("#add_point  img"),"Should append <img> element when 'image' property of item specified");
         cy.get("#app > div").trigger("contextmenu").then(() => {
           assert.equal(menu.panel.style.display,'',"Should display context menu on right mouse click");
         })
