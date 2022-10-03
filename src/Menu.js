@@ -8,7 +8,7 @@ export default function Menu(items,container,eventName=null) {
     this.cursorY = 0;
 
     this.maxImageHeight = 0;
-    
+
     this.init = () => {
         this.panel = document.createElement("div");
         this.drawItems();
@@ -40,7 +40,7 @@ export default function Menu(items,container,eventName=null) {
             span.innerHTML = item.title;
             div.appendChild(span);
             this.panel.appendChild(div);
-        };
+        }
         this.drawImages();
         setTimeout(() => {
             this.adjustImagesWidth(this.maxImageHeight);
@@ -49,10 +49,10 @@ export default function Menu(items,container,eventName=null) {
     }
 
     this.drawImages = () => {
-        const items = this.items.filter(item => item.image && typeof(item.image)!== "undefined");
+        const imgItems = this.items.filter(item => item.image && typeof(item.image)!== "undefined");
         this.maxImageHeight = 0;
         let listeners = {};
-        for (let item of items) {
+        for (let item of imgItems) {
             const img = new Image();
             const span = this.panel.querySelector("#"+item.id+" > span");
             img.style.display = 'none';
@@ -72,13 +72,13 @@ export default function Menu(items,container,eventName=null) {
         }
     }
 
-    this.adjustImagesWidth = (maxWidth) => {
+    this.adjustImagesWidth = (maxSize) => {
         for (let img of this.panel.querySelectorAll("img")) {
             const canvas = document.createElement("canvas");
-            canvas.width = maxWidth;
-            canvas.height = maxWidth;
+            canvas.width = maxSize;
+            canvas.height = maxSize;
             const ctx = canvas.getContext("2d");
-            ctx.drawImage(img,parseInt(maxWidth/2-img.width/2),0,img.width,img.height);
+            ctx.drawImage(img,Math.round(maxSize/2-img.width/2),0,img.width,img.height);
             img.src = canvas.toDataURL();
         }
     }
