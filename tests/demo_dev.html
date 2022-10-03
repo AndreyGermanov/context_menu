@@ -17,11 +17,13 @@
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <script type="module">
     import {Menus} from "../src/index.js";
-    Menus.create([
+    const menu = Menus.create([
         {id:"item1",title:"The first item",image:"http://localhost:5173/tests/about.jpg"},
         {id:"item2",title:"The second item",image:"http://localhost:5173/tests/about.jpg"},
         {id:"item3",title:"The third item",image:"http://localhost:5173/tests/about.jpg"}
     ],document.querySelector("#item"));
+    menu.addItem("item4","New","http://localhost:5173/tests/chatter.png");
+
 </script>
 </body>
 </html>
