@@ -1,0 +1,48 @@
+{
+  "name": "context_menu",
+  "private": false,
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Andrey Germanov <andrey@germanov.dev> (https://germanov.dev)",
+  "type": "module",
+  "files": [
+    "context_menu.js",
+    "context_menu.umd.cjs"
+  ],
+  "module": "./context_menu.js",
+  "main": "./context_menu.umd.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node_modules/cypress/bin/cypress open",
+    "apidoc": "node_modules/.bin/jsdoc2md src/**/*.js src/*.js> docs/API.md"
+  },
+  "exports": {
+    ".": {
+      "import": "./context_menu.js",
+      "require": "./context_menu.umd.cjs"
+    }
+  },
+  "devDependencies": {
+    "cypress": "^10.6.0",
+    "jsdoc-to-markdown": "^7.1.1",
+    "vite": "^3.0.7"
+  },
+  "description": "Simple customizable context menus for JavaScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreyGermanov/context_menu.git"
+  },
+  "keywords": [
+    "menu",
+    "UI",
+    "frontend",
+    "widget",
+    "design"
+  ],
+  "bugs": {
+    "url": "https://github.com/AndreyGermanov/context_menu/issues"
+  },
+  "homepage": "https://github.com/AndreyGermanov/smart_shape#readme"
+}
