@@ -59,28 +59,28 @@ describe('Events tests', () => {
       Cypress.$("#app").toArray()[0].appendChild(menu.panel);
       cy.wait(1000).then(() => {
         menu.show();
-        cy.get("#copy_shape").click().then(() => {
+        cy.get("#copy_shape").click({force: true}).then(() => {
           assert.isTrue(trigger1,"Should react on click on first item");
           cy.wait(100).then(() => {
             assert.equal(menu.panel.style.display,'none',"Should hide menu after click on it");
             menu.show();
-            cy.get("#add_point").click().then(() => {
+            cy.get("#add_point").click({force: true}).then(() => {
               assert.isTrue(trigger2,"Should react on click on second item");
               cy.wait(100).then(() => {
                 assert.equal(menu.panel.style.display,'none',"Should hide menu after click on it");
                 menu.show();
-                cy.get("#save_svg").click().then(() => {
+                cy.get("#save_svg").click({force: true}).then(() => {
                   assert.isTrue(trigger3, "Should react on click on third item");
                   cy.wait(100).then(() => {
                     assert.equal(menu.panel.style.display,'none',"Should hide menu after click on it");
                     menu.show();
-                    cy.get("#copy_shape").trigger("mouseover").then(() => {
+                    cy.get("#copy_shape").trigger("mouseover",{force: true}).then(() => {
                       assert.isTrue(trigger4, "Should react on mouseover on first item");
                       assert.equal(menu.panel.style.display, '', "Should not hide menu after hover on it");
-                      cy.get("#add_point").trigger("mouseover").then(() => {
+                      cy.get("#add_point").trigger("mouseover",{force: true}).then(() => {
                         assert.isTrue(trigger5, "Should react on mouseover on second item");
                         assert.equal(menu.panel.style.display, '', "Should not hide menu after click on it");
-                        cy.get("#save_svg").trigger("mouseover").then(() => {
+                        cy.get("#save_svg").trigger("mouseover",{force: true}).then(() => {
                           assert.isTrue(trigger6, "Should react on mouseover on third item");
                           assert.equal(menu.panel.style.display, '', "Should not hide menu after click on it");
                           menu.hide();

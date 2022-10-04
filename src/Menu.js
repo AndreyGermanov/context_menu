@@ -55,21 +55,7 @@ export default function Menu(items,container,eventType=null) {
         document.body.appendChild(this.panel);
         this.setStyles();
         this.drawImages();
-        for (let name of ["click","mouseover","mouseout","dblclick","mousedown","mouseup","mousemove"]) {
-            for (let item of this.items) {
-                this.listeners[name+"_"+item.id] = (event) => {
-                    EventsManager.emit(name, this, createEvent(event, {
-                        target: this, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
-                    }))
-                    setTimeout(() => {
-                        if (["click", "mousedown", "mouseup", "dblclick"].indexOf(name) !== -1) {
-                            this.hide();
-                        }
-                    }, 100)
-                };
-                this.panel.querySelector("#"+item.id).addEventListener(name, this.listeners[name+"_"+item.id])
-            }
-        }
+        this.setItemsEventListeners();
         setTimeout(() => {
             this.adjustImagesWidth(this.maxImageHeight);
             this.setStyles();
@@ -102,6 +88,23 @@ export default function Menu(items,container,eventType=null) {
         }
     }
 
+    this.setItemsEventListeners = () => {
+        for (let name of ["click","mouseover","mouseout","dblclick","mousedown","mouseup","mousemove"]) {
+            for (let item of this.items) {
+                this.listeners[name+"_"+item.id] = (event) => {
+                    EventsManager.emit(name, this, createEvent(event, {
+                        container: this.container, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
+                    }))
+                    setTimeout(() => {
+                        if (["click", "mousedown", "mouseup", "dblclick"].indexOf(name) !== -1) {
+                            this.hide();
+                        }
+                    }, 100)
+                };
+                this.panel.querySelector("#"+item.id).addEventListener(name, this.listeners[name+"_"+item.id])
+            }
+        }
+    }
     this.adjustImagesWidth = (maxSize) => {
         for (let img of this.panel.querySelectorAll("img")) {
             const canvas = document.createElement("canvas");
@@ -114,18 +117,20 @@ export default function Menu(items,container,eventType=null) {
     }
 
     this.show = () => {
-        this.panel.style.left = this.cursorX +"px";
-        this.panel.style.top = this.cursorY+"px";
+        let left = this.cursorX;
+        let top = this.cursorY;
+        this.panel.style.left = left +"px";
+        this.panel.style.top = top+"px";
         this.panel.style.zIndex = "10000";
         this.panel.style.display = '';
         this.panel.style.position = 'absolute';
-        if (this.cursorX+this.panel.clientWidth > window.innerWidth) {
-            this.cursorX = window.innerWidth - this.panel.clientWidth - 10;
-            this.panel.style.left = this.cursorX +"px";
+        if (left+this.panel.clientWidth > window.innerWidth) {
+            left = window.innerWidth - this.panel.clientWidth - 10;
+            this.panel.style.left = left +"px";
         }
         if (this.origEvent.clientY+this.panel.clientHeight > window.innerHeight) {
-            this.cursorY = this.cursorY - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
-            this.panel.style.top = this.cursorY +"px";
+            top = top - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
+            this.panel.style.top = top +"px";
         }
     }
 
@@ -148,6 +153,8 @@ export default function Menu(items,container,eventType=null) {
     }
 
     this.findItemById = (id) => Array.from(this.panel.querySelectorAll("div")).find(item => item.id === id);
+
+    this.setId = (id) => this.panel.id = id;
 
     /**
      * @ignore
