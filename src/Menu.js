@@ -20,13 +20,7 @@ export default function Menu(items,container,eventType=null) {
         Object.assign(this,new StylesHelper(this));
         this.drawItems();
         this.container.addEventListener(this.event, (event) => {
-            this.origEvent = event;
-            event.preventDefault();
-            event.stopPropagation();
-            event.cancelBubble = true;
-            this.cursorX = event.pageX;
-            this.cursorY = event.pageY;
-            this.show();
+            this.onEvent(event);
             return false;
         });
         document.addEventListener("mouseup", (event) => {
@@ -37,12 +31,25 @@ export default function Menu(items,container,eventType=null) {
         return this;
     }
 
+    this.onEvent = (event) => {
+        this.origEvent = event;
+        event.preventDefault();
+        event.stopPropagation();
+        event.cancelBubble = true;
+        this.cursorX = event.pageX;
+        this.cursorY = event.pageY;
+        this.show();
+    }
+
     this.drawItems = () => {
         this.removeAllEventListeners();
         try {
             document.body.removeChild(this.panel);
         } catch (err) {}
         this.panel = document.createElement("div");
+        this.panel.style.visibility = 'hidden';
+        const overflowY = document.body.style.overflowY;
+        document.body.style.overflowY = 'clip';
         for (let item of this.items) {
             const div = document.createElement("div");
             div.id = item.id;
@@ -59,12 +66,18 @@ export default function Menu(items,container,eventType=null) {
         setTimeout(() => {
             this.adjustImagesWidth(this.maxImageHeight);
             this.setStyles();
-            this.panel.style.display = 'none';
-
+            if (this.panel) {
+                this.panel.style.display = 'none';
+                this.panel.style.visibility = 'visible';
+                document.body.style.overflowY = overflowY;
+            }
         },100);
     }
 
     this.drawImages = () => {
+        if (!this.panel) {
+            return
+        }
         const imgItems = this.items.filter(item => item.image && typeof(item.image)!== "undefined");
         this.maxImageHeight = 0;
         let listeners = {};
@@ -74,6 +87,9 @@ export default function Menu(items,container,eventType=null) {
             img.style.display = 'none';
             img.src = item.image;
             listeners[item.id] = () => {
+                if (!this.panel) {
+                    return
+                }
                 img.height = this.panel.querySelector("#" + item.id).clientHeight;
                 if (img.height > this.maxImageHeight) {
                     this.maxImageHeight = img.height;
@@ -106,6 +122,9 @@ export default function Menu(items,container,eventType=null) {
         }
     }
     this.adjustImagesWidth = (maxSize) => {
+        if (!this.panel) {
+            return
+        }
         for (let img of this.panel.querySelectorAll("img")) {
             const canvas = document.createElement("canvas");
             canvas.width = maxSize;
@@ -117,6 +136,9 @@ export default function Menu(items,container,eventType=null) {
     }
 
     this.show = () => {
+        if (!this.panel) {
+            return
+        }
         let left = this.cursorX;
         let top = this.cursorY;
         this.panel.style.left = left +"px";
@@ -135,7 +157,9 @@ export default function Menu(items,container,eventType=null) {
     }
 
     this.hide = () => {
-        this.panel.style.display = 'none';
+        if (this.panel) {
+            this.panel.style.display = 'none';
+        }
     }
 
     this.addItem = (id,title,image=null) => {
@@ -206,9 +230,28 @@ export default function Menu(items,container,eventType=null) {
             }
         }
         this.subscriptions = {};
+        if (!this.panel) {
+            return
+        }
         for (let listener in this.listeners) {
             const [name,id] = listener.split("_");
-            this.panel.querySelector("#"+id).removeEventListener(name,this.listeners[listener]);
+            const div = this.panel.querySelector("#"+id);
+            if (div) {
+                div.removeEventListener(name, this.listeners[listener]);
+            }
         }
+    }
+
+    this.destroy = () => {
+        this.removeAllEventListeners();
+        this.items = [];
+        this.container = null;
+        try {
+            document.body.removeChild(this.panel);
+        } catch (err) {}
+        if (this.panel) {
+            this.panel.innerHTML = "";
+        }
+        this.panel = null;
     }
 }

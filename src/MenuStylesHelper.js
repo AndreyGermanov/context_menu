@@ -8,6 +8,9 @@ export default function MenuStylesHelper(menu) {
     this.itemsCssClassesById = {};
 
     this.setStyles = () => {
+        if (!this.menu.panel) {
+            return
+        }
         if (!this.panelCssClass) {
             this.menu.panel.style.padding = "3px";
             this.menu.panel.style.borderStyle = "solid";
@@ -70,6 +73,7 @@ export default function MenuStylesHelper(menu) {
                 span.className = this.itemTextCssClass;
             } else {
                 span.className = "";
+                span.style.color = "black";
             }
         }
     }
