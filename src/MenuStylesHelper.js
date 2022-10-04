@@ -53,6 +53,7 @@ export default function MenuStylesHelper(menu) {
                 itemDiv.style.color = "black";
             })
         }
+        itemDiv.style.whiteSpace = 'nowrap';
     }
 
     this.setItemSpanStyles = (item) => {

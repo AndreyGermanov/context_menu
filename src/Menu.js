@@ -8,7 +8,7 @@ export default function Menu(items,container,eventType=null) {
     this.items = items;
     this.event = eventType || "contextmenu";
     this.listeners = {};
-
+    this.origEvent = null;
     this.cursorX = 0;
     this.cursorY = 0;
 
@@ -20,6 +20,7 @@ export default function Menu(items,container,eventType=null) {
         Object.assign(this,new StylesHelper(this));
         this.drawItems();
         this.container.addEventListener(this.event, (event) => {
+            this.origEvent = event;
             event.preventDefault();
             event.stopPropagation();
             event.cancelBubble = true;
@@ -118,6 +119,14 @@ export default function Menu(items,container,eventType=null) {
         this.panel.style.zIndex = "10000";
         this.panel.style.display = '';
         this.panel.style.position = 'absolute';
+        if (this.cursorX+this.panel.clientWidth > window.innerWidth) {
+            this.cursorX = window.innerWidth - this.panel.clientWidth - 10;
+            this.panel.style.left = this.cursorX +"px";
+        }
+        if (this.origEvent.clientY+this.panel.clientHeight > window.innerHeight) {
+            this.cursorY = this.cursorY - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
+            this.panel.style.top = this.cursorY +"px";
+        }
     }
 
     this.hide = () => {
