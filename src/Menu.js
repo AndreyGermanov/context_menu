@@ -1,20 +1,24 @@
 import StylesHelper from "./MenuStylesHelper.js";
+import EventsManager from "./EventsManager.js";
+import {createEvent} from "./functions.js";
 
-export default function Menu(items,container,eventName=null) {
+export default function Menu(items,container,eventType=null) {
     this.panel = null;
     this.container = container;
     this.items = items;
-    this.eventName = eventName || "contextmenu";
+    this.event = eventType || "contextmenu";
 
     this.cursorX = 0;
     this.cursorY = 0;
 
     this.maxImageHeight = 0;
 
+    this.subscriptions = {};
+
     this.init = () => {
         Object.assign(this,new StylesHelper(this));
         this.drawItems();
-        this.container.addEventListener(this.eventName, (event) => {
+        this.container.addEventListener(this.event, (event) => {
             event.preventDefault();
             event.stopPropagation();
             event.cancelBubble = true;
@@ -32,6 +36,7 @@ export default function Menu(items,container,eventName=null) {
     }
 
     this.drawItems = () => {
+        this.removeAllEventListeners();
         try {
             document.body.removeChild(this.panel);
         } catch (err) {}
@@ -44,8 +49,21 @@ export default function Menu(items,container,eventName=null) {
             span.innerHTML = item.title;
             div.appendChild(span);
             this.panel.appendChild(div);
-            document.body.appendChild(this.panel);
+            for (let name of ["click","mouseover","mouseout","dblclick","mousedown","mouseup","mousemove"]) {
+                div.addEventListener(name,(event) => {
+                    EventsManager.emit(name,this,createEvent(event,{
+                        target:this,cursorX:this.cursorX,cursorY:this.cursorY,itemId:item.id
+                    }))
+                    setTimeout(() => {
+                        if (["click","mousedown","mouseup","dblclick"].indexOf(name) !== -1) {
+                            this.hide();
+                        }
+                    },1)
+                })
+
+            }
         }
+        document.body.appendChild(this.panel);
         this.setStyles();
         this.drawImages();
         setTimeout(() => {
@@ -116,7 +134,57 @@ export default function Menu(items,container,eventName=null) {
         this.drawItems();
     }
 
-
-
     this.findItemById = (id) => Array.from(this.panel.querySelectorAll("div")).find(item => item.id === id);
+
+    /**
+     * @ignore
+     * Uniform method that used to add event handler of specified type to this object.
+     * @param eventName {string} Name of event
+     * @param handler {function} Function that used as an event handler
+     * @returns {function} Pointer to added event handler. Should be used to remove event listener later.
+     */
+    this.addEventListener = (eventName,handler) => {
+        if (typeof(this.subscriptions[eventName]) === "undefined") {
+            this.subscriptions[eventName] = [];
+        }
+        const listener = EventsManager.subscribe(eventName, (event) => {
+            if (event.target === this) {
+                handler(event)
+            }
+        });
+        this.subscriptions[eventName].push(listener);
+        return listener;
+    }
+
+    /**
+     * @ignore
+     * Uniform method that used to remove event handler, that previously added
+     * to this object.
+     * @param eventName {string} Name of event to remove listener from
+     * @param listener {function} Pointer to event listener, that added previously.
+     * It was returned from [addEventListener](#ResizeBox+addEventListener) method.
+     */
+    this.removeEventListener = (eventName,listener) => {
+        if (this.subscriptions[eventName] && typeof(this.subscriptions[eventName]) !== "undefined") {
+            this.subscriptions[eventName].splice(this.subscriptions[eventName].indexOf(listener), 1);
+        }
+        EventsManager.unsubscribe(eventName,listener)
+    }
+
+    this.on = (eventName,handler) => {
+        this.addEventListener(eventName, handler)
+    }
+
+    this.off = (eventName,handler) => {
+        this.removeEventListener(eventName, handler);
+    }
+
+    this.removeAllEventListeners = () => {
+        for (let eventName in this.subscriptions) {
+            for (let handler of this.subscriptions[eventName]) {
+                EventsManager.unsubscribe(eventName,handler);
+            }
+        }
+        this.subscriptions = {};
+    }
 }
