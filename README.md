@@ -19,13 +19,13 @@ Download the library file [context_menu.umd.cjs](https://code.germanov.dev/conte
 or, if you develop project with JavaScript framework, you can install it using NPM:
 
 ```
-npm install js_context_menu
+npm install js_ctx_menu
 ```
 
 and import to your JavaScript code:
 
 ```javascript
-import {Menus} from "js_context_menu";
+import {Menus} from "js_ctx_menu";
 ```
 
 ## Use
