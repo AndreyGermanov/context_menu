@@ -1,4 +1,4 @@
-# Simple Context Menu
+# Simple Javascript Menu
 
 A JavaScript library to create a context menus for your web pages.
 
