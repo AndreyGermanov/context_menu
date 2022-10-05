@@ -16,7 +16,8 @@ describe('Menus in basic mode tests', () => {
           {id: "add_point", title: "Add Point"},
           {id: "save_svg", title: "Save to SVG"}
       ],div);
-      cy.wait(100).then(() => {
+      menu.drawMenu();
+      cy.wait(100).then(async() => {
         assert.isNotNull(menu, "Should create context menu");
         assert.isDefined(menu.panel,"Should create menu panel");
         assert.isNotNull(menu.panel,"Should create menu panel");
@@ -26,7 +27,7 @@ describe('Menus in basic mode tests', () => {
         assert.isNotNull(menu.panel.querySelector("#add_point"),"Should contain element for second menu item");
         assert.isNotNull(menu.panel.querySelector("#save_svg"),"Should contain element for third menu item");
         assert.equal(menu.event,"contextmenu","Default trigger event should be right mouse click");
-        menu.items[1].image = "http://localhost:5173:/tests/about.jpg";
+        menu.items[1].image = "http://localhost:5173/tests/about.jpg";
         menu.drawMenu();
         assert.isDefined(Cypress.$("#add_point  img"),"Should append 'img' element when 'image' property of item specified");
         cy.get("#app > div").trigger("contextmenu").then(() => {

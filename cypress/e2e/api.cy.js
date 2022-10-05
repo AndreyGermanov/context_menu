@@ -4,6 +4,7 @@ describe('Menu API tests', () => {
   it('addItem', () => {
     cy.visit('http://localhost:5173/tests/index.html').then(() => {
       const menu = Menus.create([],Cypress.$("#app").toArray()[0],"contextmenu");
+      menu.drawMenu();
       cy.wait(100).then(() => {
         assert.equal(menu.panel.querySelectorAll("div").length,0,"Should be empty menu without items");
         menu.addItem("item1","Item 1","http://localhost:5173/tests/about.jpg");
@@ -16,6 +17,7 @@ describe('Menu API tests', () => {
   it('removeItem', () => {
     cy.visit('http://localhost:5173/tests/index.html').then(() => {
       const menu = Menus.create([],Cypress.$("#app").toArray()[0],"contextmenu");
+      menu.drawMenu();
       cy.wait(100).then(() => {
         assert.equal(menu.panel.querySelectorAll("div").length,0,"Should be empty menu without items");
         menu.addItem("item1","Item 1","http://localhost:5173/tests/about.jpg");
@@ -43,6 +45,7 @@ describe('Menu API tests', () => {
       {id: "add_point", title: "Add Point"},
       {id: "save_svg", title: "Save to SVG"}
     ],div);
+    menu.drawMenu();
     cy.wait(100).then(() => {
       const item = menu.findItemById("add_point");
       assert.isDefined(item,"Item should be defined");

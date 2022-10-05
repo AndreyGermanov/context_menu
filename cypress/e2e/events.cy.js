@@ -2,7 +2,7 @@ import {Menus} from "../../src/index.js";
 
 describe('Events tests', () => {
   it('should pass default events', () => {
-    cy.visit('http://localhost:5173/tests/index.html').then(() => {
+    cy.visit('http://localhost:5173/tests/index.html').then(async() => {
       const div = document.createElement("div");
       div.style.position = "absolute";
       div.style.left = "100px";
@@ -23,7 +23,9 @@ describe('Events tests', () => {
       let trigger4 = false;
       let trigger5 = false;
       let trigger6 = false;
+      await menu.drawMenu();
       menu.on("click", (event) => {
+        console.log("CLICK");
         assert.equal(event.owner,menu,"Should have menu object as an event owner");
         assert.equal(event.target,div,"Should have div element as an event target");
         assert.equal(event.cursorX,10,"Should save cursor X position oaf a moment when menu panel appeared");
@@ -59,23 +61,23 @@ describe('Events tests', () => {
       });
       cy.get("#div1").trigger("contextmenu",{pageX:10,pageY:10});
       Cypress.$("#app").toArray()[0].appendChild(menu.panel);
-      cy.wait(1000).then(() => {
-        menu.show();
+      cy.wait(1000).then(async() => {
+        await menu.show();
         cy.get("#copy_shape").click({force: true}).then(() => {
           assert.isTrue(trigger1,"Should react on click on first item");
-          cy.wait(100).then(() => {
+          cy.wait(100).then(async() => {
             assert.equal(menu.panel.style.display,'none',"Should hide menu after click on it");
-            menu.show();
+            await menu.show();
             cy.get("#add_point").click({force: true}).then(() => {
               assert.isTrue(trigger2,"Should react on click on second item");
-              cy.wait(100).then(() => {
+              cy.wait(100).then(async() => {
                 assert.equal(menu.panel.style.display,'none',"Should hide menu after click on it");
-                menu.show();
+                await menu.show();
                 cy.get("#save_svg").click({force: true}).then(() => {
                   assert.isTrue(trigger3, "Should react on click on third item");
-                  cy.wait(100).then(() => {
+                  cy.wait(100).then(async() => {
                     assert.equal(menu.panel.style.display,'none',"Should hide menu after click on it");
-                    menu.show();
+                    await menu.show();
                     cy.get("#copy_shape").trigger("mouseover",{force: true}).then(() => {
                       assert.isTrue(trigger4, "Should react on mouseover on first item");
                       assert.equal(menu.panel.style.display, '', "Should not hide menu after hover on it");

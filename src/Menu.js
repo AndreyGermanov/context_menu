@@ -138,7 +138,6 @@ function Menu(items,container,eventType=null) {
      */
     this.drawMenu = () => {
         return new Promise(async(resolve) => {
-            this.removeAllEventListeners();
             try {
                 document.body.removeChild(this.panel);
             } catch (err) {}

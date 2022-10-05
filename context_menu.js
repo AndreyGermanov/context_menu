@@ -108,7 +108,6 @@ function f(n, t, e = null) {
   }), this), this.onEvent = (s) => {
     this.origEvent = s, s.preventDefault(), s.stopPropagation(), s.cancelBubble = !0, this.cursorX = s.pageX, this.cursorY = s.pageY, this.show();
   }, this.drawMenu = () => new Promise(async (s) => {
-    this.removeAllEventListeners();
     try {
       document.body.removeChild(this.panel);
     } catch {
