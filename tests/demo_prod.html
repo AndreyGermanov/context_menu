@@ -5,7 +5,7 @@
         .panel {
             background-color: #454d55;
             border-width:0;
-            color: white;
+            color:white;
             box-shadow: 5px 5px #88888855;
             border-radius: 10px;
         }
@@ -21,7 +21,6 @@
             background-color: yellow;
             color: black;
         }
-
         .last_item {
             padding:3px;
             border-bottom-width: 0;
@@ -29,7 +28,6 @@
             font-size:15px;
             text-transform: uppercase;
         }
-
         .last_item:hover {
             background-color: yellow;
             color: black;
@@ -65,10 +63,15 @@
     // create the menu with specified items and bind it to specified DIV
     const menu = Menus.create(items,div);
     // apply custom CSS classes to the menu and items
+
+    // Set class for menu panel
     menu.setPanelClass("panel");
+    // Set class for all menu items
     menu.setItemClass("item");
-    menu.setTextClass("text");
+    // Set specific class for last menu item (remove bottom border)
     menu.setItemClass("last_item","item3");
+    // Reset default styles of text to use text color from panel
+    menu.setTextClass(" ");
 
     // react when user clicks on menu items
     menu.on('click', (event) => {
