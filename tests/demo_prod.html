@@ -1,44 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Page for Cypress tests</title>
+    <title>Context Menu Demo</title>
+    <script src="https://code.germanov.dev/context_menu/context_menu.umd.cjs"></script>
 </head>
 <body>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<div id="myDiv">My element</div>
 
-<div id="item" style="background-color: #cccccc;width:300px">Click me</div>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<script src="../context_menu.umd.cjs"></script>
 <script>
-    const menu = Menus.create([
-        {id:"item1",title:"The first item",image:"http://localhost:5173/tests/about.jpg"},
-        {id:"item2",title:"The second item",image:"http://localhost:5173/tests/about.jpg"},
-        {id:"item3",title:"The third item",image:"http://localhost:5173/tests/about.jpg"}
-    ],document.querySelector("#item"));
-    menu.addItem("item4","New","http://localhost:5173/tests/chatter.png");
-    menu.addEventListener("click",(event) => {
-        switch(event.itemId) {
+    const div = document.getElementById("myDiv");
+    const items = [
+        {id:"item1", title: "Item 1"},
+        {id:"item2", title: "Item 2"},
+        {id:"item3", title: "Item 3"}
+    ];
+    const menu = Menus.create(items,div);
+
+    menu.on('click', (event) => {
+        switch (event.itemId) {
             case "item1":
-                console.log("trigger 1");
+                console.log("User clicked first item");
+                console.log("Mouse cursor position X:",
+                    event.cursorX,"Y:",event.cursorY);
                 break;
             case "item2":
-                console.log("trigger 2");
+                console.log("User clicked second item");
+                console.log("Mouse cursor position X:",
+                    event.cursorX,"Y:",event.cursorY);
                 break;
             case "item3":
-                console.log("trigger 3");
-                break;
-            case "item4":
-                console.log("trigger 4");
+                console.log("User clicked third item");
+                console.log("Mouse cursor position X:",
+                    event.cursorX,"Y:",event.cursorY);
                 break;
         }
     })
 </script>
+
 </body>
 </html>
