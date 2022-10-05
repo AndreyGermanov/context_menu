@@ -24,7 +24,8 @@ describe('Events tests', () => {
       let trigger5 = false;
       let trigger6 = false;
       menu.on("click", (event) => {
-        assert.equal(event.target,menu,"Should have menu object as an event target");
+        assert.equal(event.owner,menu,"Should have menu object as an event owner");
+        assert.equal(event.target,div,"Should have div element as an event target");
         assert.equal(event.cursorX,10,"Should save cursor X position oaf a moment when menu panel appeared");
         assert.equal(event.cursorY,10,"Should save cursor Y position oaf a moment when menu panel appeared");
         switch (event.itemId) {
@@ -40,7 +41,8 @@ describe('Events tests', () => {
         }
       });
       menu.on("mouseover", (event) => {
-        assert.equal(event.target,menu,"Should have menu object as an event target");
+        assert.equal(event.owner,menu,"Should have menu object as an event owner");
+        assert.equal(event.target,div,"Should have div element as an event target");
         assert.equal(event.cursorX,10,"Should save cursor X position oaf a moment when menu panel appeared");
         assert.equal(event.cursorY,10,"Should save cursor Y position oaf a moment when menu panel appeared");
         switch (event.itemId) {
@@ -92,7 +94,6 @@ describe('Events tests', () => {
               })
             })
           })
-
         })
       })
     });

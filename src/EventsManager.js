@@ -1,10 +1,10 @@
 /**
+ * @ignore
  * Used as a singleton object to emit events and subscribe to these events.
  * One object can subscribe to events of specified type, other object can emit events of this type.
  * Each time when object emits event, all subscribed event handlers triggered.
  * @constructor
  */
-
 function EventsManager() {
 
     /**
