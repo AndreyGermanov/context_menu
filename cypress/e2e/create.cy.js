@@ -25,10 +25,10 @@ describe('Menus in basic mode tests', () => {
         assert.isNotNull(menu.panel.querySelector("#copy_shape"),"Should contain element for first menu item");
         assert.isNotNull(menu.panel.querySelector("#add_point"),"Should contain element for second menu item");
         assert.isNotNull(menu.panel.querySelector("#save_svg"),"Should contain element for third menu item");
-        assert.equal(menu.eventName,"contextmenu","Default trigger event should be right mouse click");
+        assert.equal(menu.event,"contextmenu","Default trigger event should be right mouse click");
         menu.items[1].image = "http://localhost:5173:/tests/about.jpg";
-        menu.drawItems();
-        assert.isDefined(Cypress.$("#add_point  img"),"Should append <img> element when 'image' property of item specified");
+        menu.drawMenu();
+        assert.isDefined(Cypress.$("#add_point  img"),"Should append 'img' element when 'image' property of item specified");
         cy.get("#app > div").trigger("contextmenu").then(() => {
           assert.equal(menu.panel.style.display,'',"Should display context menu on right mouse click");
         })

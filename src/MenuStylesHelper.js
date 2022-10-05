@@ -166,7 +166,7 @@ function MenuStylesHelper(menu) {
      */
     this.setPanelClass = (className=null) => {
         this.panelCssClass = className || "";
-        this.menu.drawItems();
+        this.menu.drawMenu();
     }
 
     /**
@@ -178,11 +178,11 @@ function MenuStylesHelper(menu) {
     this.setItemClass = (className=null,id=null) => {
         if (id) {
             this.setClassForItem(id,ItemParts.ITEM, className);
-            this.menu.drawItems();
+            this.menu.drawMenu();
             return
         }
         this.itemCssClass = className || "";
-        this.menu.drawItems();
+        this.menu.drawMenu();
     }
 
     /**
@@ -194,11 +194,11 @@ function MenuStylesHelper(menu) {
     this.setTextClass = (className=null,id=null) => {
         if (id) {
             this.setClassForItem(id,ItemParts.TEXT, className);
-            this.menu.drawItems();
+            this.menu.drawMenu();
             return
         }
         this.itemTextCssClass = className || "";
-        this.menu.drawItems();
+        this.menu.drawMenu();
     }
 
     /**
@@ -210,11 +210,11 @@ function MenuStylesHelper(menu) {
     this.setImageClass = (className=null,id=null) => {
         if (id) {
             this.setClassForItem(id,ItemParts.IMAGE,className);
-            this.menu.drawItems();
+            this.menu.drawMenu();
             return
         }
         this.itemImageCssClass = className || "";
-        this.menu.drawItems();
+        this.menu.drawMenu();
     }
 
     /**
