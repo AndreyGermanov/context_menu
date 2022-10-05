@@ -96,6 +96,9 @@ function MenuStylesHelper(menu) {
             itemDiv.className = this.itemCssClass || "";
         } else {
             itemDiv.className = "";
+            itemDiv.style.display = 'flex';
+            itemDiv.style.flexDirection = 'row';
+            itemDiv.style.alignItems = 'center';
             itemDiv.style.paddingTop = "2px";
             itemDiv.style.paddingLeft = "3px";
             itemDiv.style.paddingRight = "3px";

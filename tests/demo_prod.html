@@ -1,21 +1,79 @@
 <html>
 <head>
     <title>Context Menu Demo</title>
+    <style>
+        .panel {
+            background-color: #454d55;
+            border-width:0;
+            color: white;
+            box-shadow: 5px 5px #88888855;
+            border-radius: 10px;
+        }
+        .item {
+            border-bottom-style: outset;
+            padding:3px;
+            border-bottom-width: 1px;
+            font-weight:bold;
+            font-size:15px;
+            text-transform: uppercase;
+        }
+        .item:hover {
+            background-color: yellow;
+            color: black;
+        }
+
+        .last_item {
+            padding:3px;
+            border-bottom-width: 0;
+            font-weight:bold;
+            font-size:15px;
+            text-transform: uppercase;
+        }
+
+        .last_item:hover {
+            background-color: yellow;
+            color: black;
+        }
+    </style>
     <script src="https://code.germanov.dev/context_menu/context_menu.umd.cjs"></script>
 </head>
 <body>
 <div id="myDiv">My element</div>
 
 <script>
-    const div = document.getElementById("myDiv");
-    const items = [
-        {id:"item1", title: "Item 1"},
-        {id:"item2", title: "Item 2"},
-        {id:"item3", title: "Item 3"}
-    ];
-    const menu = Menus.create(items,div);
 
+    // obtain an element for menu
+    const div = document.getElementById("myDiv");
+    // define menu items
+    const items = [
+        {
+            id:"item1",
+            title: "Batman",
+            image:"https://code.germanov.dev/context_menu/assets/batman.svg"
+        },
+        {
+            id:"item2",
+            title: "Hacker",
+            image:"https://code.germanov.dev/context_menu/assets/hacker.svg"
+        },
+        {
+            id:"item3",
+            title: "Santa",
+            image:"https://code.germanov.dev/context_menu/assets/santa.svg"
+        }
+    ];
+    // create the menu with specified items and bind it to specified DIV
+    const menu = Menus.create(items,div);
+    // apply custom CSS classes to the menu and items
+    menu.setPanelClass("panel");
+    menu.setItemClass("item");
+    menu.setTextClass("text");
+    menu.setItemClass("last_item","item3");
+
+    // react when user clicks on menu items
     menu.on('click', (event) => {
+        // run different actions depending on ID of item
+        // on which user has clicked
         switch (event.itemId) {
             case "item1":
                 console.log("User clicked first item");

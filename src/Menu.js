@@ -1,6 +1,6 @@
 import StylesHelper from "./MenuStylesHelper.js";
 import EventsManager from "./EventsManager.js";
-import {createEvent} from "./functions.js";
+import {blobToDataURL, createEvent} from "./functions.js";
 
 /**
  * Context menu panel object.
@@ -105,7 +105,6 @@ function Menu(items,container,eventType=null) {
      */
     this.init = () => {
         Object.assign(this,new StylesHelper(this));
-        this.drawMenu();
         this.container.addEventListener(this.event, (event) => {
             this.onEvent(event);
             return false;
@@ -121,7 +120,7 @@ function Menu(items,container,eventType=null) {
     /**
      * @ignore
      * Method executed when event that should show menu triggers on `container` element
-     * @param event {MouseEvent} Event object
+     * @param event {Event} Event object
      */
     this.onEvent = (event) => {
         this.origEvent = event;
@@ -138,38 +137,44 @@ function Menu(items,container,eventType=null) {
      * Method used to construct menu HTML element with it items
      */
     this.drawMenu = () => {
-        this.removeAllEventListeners();
-        try {
-            document.body.removeChild(this.panel);
-        } catch (err) {}
-        this.panel = document.createElement("div");
-        this.panel.style.visibility = 'hidden';
-        if (!this.overflowY && document.body.style.overflowY !== "clip") {
-            this.overflowY = document.body.style.overflowY;
-        }
-        document.body.style.overflowY = 'clip';
-        for (let item of this.items) {
-            const div = document.createElement("div");
-            div.id = item.id;
-            div.style.cursor = 'pointer';
-            const span = document.createElement("span");
-            span.innerHTML = item.title;
-            div.appendChild(span);
-            this.panel.appendChild(div);
-        }
-        document.body.appendChild(this.panel);
-        this.setStyles();
-        this.drawImages();
-        this.setItemsEventListeners();
-        setTimeout(() => {
-            this.adjustImagesWidth(this.maxImageHeight);
-            this.setStyles();
-            if (this.panel) {
-                this.panel.style.display = 'none';
-                this.panel.style.visibility = 'visible';
-                document.body.style.overflowY = this.overflowY;
+        return new Promise(async(resolve) => {
+            this.removeAllEventListeners();
+            try {
+                document.body.removeChild(this.panel);
+            } catch (err) {}
+            this.panel = document.createElement("div");
+            this.panel.style.visibility = 'hidden';
+            if (!this.overflowY && document.body.style.overflowY !== "clip") {
+                this.overflowY = document.body.style.overflowY;
             }
-        },100);
+            document.body.style.overflowY = 'clip';
+            document.body.appendChild(this.panel);
+            for (let item of this.items) {
+                if (this.panel.querySelector("#"+item.id)) {
+                    continue;
+                }
+                const div = document.createElement("div");
+                div.id = item.id;
+                div.style.cursor = 'pointer';
+                const span = document.createElement("span");
+                span.innerHTML = item.title;
+                div.appendChild(span);
+                this.panel.appendChild(div);
+            }
+            this.setStyles();
+            await this.drawImages();
+            setTimeout(() => {
+                this.setItemsEventListeners();
+                this.adjustImagesWidth(this.maxImageHeight);
+                this.setStyles();
+                if (this.panel) {
+                    this.panel.style.display = 'none';
+                    this.panel.style.visibility = 'visible';
+                    document.body.style.overflowY = this.overflowY;
+                    resolve()
+                }
+            },100)
+        })
     }
 
     /**
@@ -177,7 +182,7 @@ function Menu(items,container,eventType=null) {
      * Method used to inject images to menu items
      * while constructing them
      */
-    this.drawImages = () => {
+    this.drawImages = async() => {
         if (!this.panel) {
             return
         }
@@ -188,7 +193,8 @@ function Menu(items,container,eventType=null) {
             const img = new Image();
             const span = this.panel.querySelector("#"+item.id+" > span");
             img.style.display = 'none';
-            img.src = item.image;
+            const url = await blobToDataURL(await (await fetch(item.image)).blob());
+            img.src = url;
             listeners[item.id] = () => {
                 if (!this.panel) {
                     return
@@ -203,7 +209,11 @@ function Menu(items,container,eventType=null) {
                 img.removeEventListener("load", listeners[item.id]);
             }
             img.addEventListener("load",listeners[item.id]);
-            this.panel.querySelector("#"+item.id).insertBefore(img,span);
+            try {
+                if (!this.panel.querySelector("#"+item.id+" img")) {
+                    this.panel.querySelector("#" + item.id).insertBefore(img, span);
+                }
+            } catch (err) {}
         }
     }
 
@@ -216,6 +226,9 @@ function Menu(items,container,eventType=null) {
         for (let name of ["click","mouseover","mouseout","dblclick","mousedown","mouseup","mousemove"]) {
             for (let item of this.items) {
                 this.listeners[name+"_"+item.id] = (event) => {
+                    if (!this.origEvent) {
+                        return
+                    }
                     EventsManager.emit(name, this.origEvent.target, createEvent(event, {
                         container: this.container, owner:this, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
                     }))
@@ -253,7 +266,8 @@ function Menu(items,container,eventType=null) {
     /**
      * Method shows menu
      */
-    this.show = () => {
+    this.show = async() => {
+        await this.drawMenu();
         if (!this.panel) {
             return
         }
@@ -263,12 +277,13 @@ function Menu(items,container,eventType=null) {
         this.panel.style.top = top+"px";
         this.panel.style.zIndex = "10000";
         this.panel.style.display = '';
+        this.panel.style.visibility = 'visible';
         this.panel.style.position = 'absolute';
         if (left+this.panel.clientWidth > window.innerWidth) {
             left = window.innerWidth - this.panel.clientWidth - 10;
             this.panel.style.left = left +"px";
         }
-        if (this.origEvent.clientY+this.panel.clientHeight > window.innerHeight) {
+        if (this.origEvent && this.origEvent.clientY+this.panel.clientHeight > window.innerHeight) {
             top = top - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
             this.panel.style.top = top +"px";
         }
