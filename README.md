@@ -99,7 +99,7 @@ When you click on any item, the `menu.on` method will react to your click and di
 
 Read more advanced tutorial here: 
 
-https://dev.to/andreygermanov/simple-way-to-add-context-menus-to-web-pages-naj-temp-slug-5593347
+https://dev.to/andreygermanov/simple-way-to-add-custom-context-menus-to-web-pages-10lc
 
 Full API documentation for `Menu` object you can find here:
 
