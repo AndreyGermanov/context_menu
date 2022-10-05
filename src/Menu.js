@@ -2,23 +2,110 @@ import StylesHelper from "./MenuStylesHelper.js";
 import EventsManager from "./EventsManager.js";
 import {createEvent} from "./functions.js";
 
-export default function Menu(items,container,eventType=null) {
+/**
+ * Context menu panel object.
+ * @param items {array} Array of menu items. Each item is an object with a following fields:
+ * `id` - unique ID of menu item.
+ * `title` - Text of menu of item
+ * `image` - URL of image, displayed on the left side of menu item (optional)
+ * @param container {HTMLElement} HTML element to which this menu belongs
+ * @param eventType {string} Name of event on HTML element that triggers the menu to appear
+ * (by default `contextmenu`, triggers when user do right mouse click on element)
+ * @constructor
+ */
+function Menu(items,container,eventType=null) {
+    /**
+     * Menu panel element
+     * @type {HTMLDivElement}
+     */
     this.panel = null;
+
+    /**
+     * Event on HTML element that triggers the menu to appear
+     * @type {HTMLElement}
+     */
     this.container = container;
+
+    /**
+     * Array of menu items. Each item is an object with a following fields:
+     * `id` - unique ID of menu item.
+     * `title` - Text of menu of item
+     * `image` - URL of image, displayed on the left side of menu item (optional)
+     * @type {Array}
+     */
     this.items = items;
+
+    /**
+     * Name of event on HTML element that triggers the menu to appear
+     * (by default `contextmenu`, triggers when user do right mouse click on element)
+     * @type {string}
+     */
     this.event = eventType || "contextmenu";
+
+    /**
+     * @ignore
+     * All registered listeners of mouse events on menu items HTML elements.
+     * keys of object are event types (like 'click', 'mouseover', 'mouseout')
+     * values of object are arrays of functions. Each function is one of event listeners,
+     * registered for this event
+     * @type {array}
+     */
     this.listeners = {};
+
+    /**
+     * @ignore
+     * Original event object which triggered on `container` element when menu appeared
+     * @type {Event}
+     */
     this.origEvent = null;
+
+    /**
+     * Mouse cursor X position in a moment when event to show menu triggered
+     * @type {number}
+     */
     this.cursorX = 0;
+
+    /**
+     * Mouse cursor Y position in a moment when event to show menu triggered
+     * @type {number}
+     */
     this.cursorY = 0;
 
+    /**
+     * @ignore
+     * Temporary value of body overflowY style before menu appeared.
+     * Used for internal reasons.
+     * @type {string}
+     */
+    this.overflowY = "";
+
+    /**
+     * @ignore
+     * The maximum height of all images of menu items. Used to
+     * calculate correct width for image of items
+     * @type {number}
+     */
     this.maxImageHeight = 0;
 
+    /**
+     * @ignore
+     * List of subscribers, that subscribed to events, emitted by
+     * this menu. This is an object, that consists of array
+     * of event handlers of each event. Each handler is a function
+     * that called when event of specified type emitted by
+     * this shape
+     * @type {object}
+     */
     this.subscriptions = {};
 
+    /**
+     * Method constructs and initializes menu, based on
+     * settings, provided in constructor
+     * @returns {Menu} this menu object
+     */
     this.init = () => {
         Object.assign(this,new StylesHelper(this));
-        this.drawItems();
+        this.drawMenu();
         this.container.addEventListener(this.event, (event) => {
             this.onEvent(event);
             return false;
@@ -31,6 +118,11 @@ export default function Menu(items,container,eventType=null) {
         return this;
     }
 
+    /**
+     * @ignore
+     * Method executed when event that should show menu triggers on `container` element
+     * @param event {MouseEvent} Event object
+     */
     this.onEvent = (event) => {
         this.origEvent = event;
         event.preventDefault();
@@ -41,14 +133,20 @@ export default function Menu(items,container,eventType=null) {
         this.show();
     }
 
-    this.drawItems = () => {
+    /**
+     * @ignore
+     * Method used to construct menu HTML element with it items
+     */
+    this.drawMenu = () => {
         this.removeAllEventListeners();
         try {
             document.body.removeChild(this.panel);
         } catch (err) {}
         this.panel = document.createElement("div");
         this.panel.style.visibility = 'hidden';
-        const overflowY = document.body.style.overflowY;
+        if (!this.overflowY && document.body.style.overflowY !== "clip") {
+            this.overflowY = document.body.style.overflowY;
+        }
         document.body.style.overflowY = 'clip';
         for (let item of this.items) {
             const div = document.createElement("div");
@@ -69,11 +167,16 @@ export default function Menu(items,container,eventType=null) {
             if (this.panel) {
                 this.panel.style.display = 'none';
                 this.panel.style.visibility = 'visible';
-                document.body.style.overflowY = overflowY;
+                document.body.style.overflowY = this.overflowY;
             }
         },100);
     }
 
+    /**
+     * @ignore
+     * Method used to inject images to menu items
+     * while constructing them
+     */
     this.drawImages = () => {
         if (!this.panel) {
             return
@@ -104,12 +207,17 @@ export default function Menu(items,container,eventType=null) {
         }
     }
 
+    /**
+     * @ignore
+     * Method used to set up event listening functions for all menu items.
+     * It forwards these events to all `subscribers`, connected to the menu object
+     */
     this.setItemsEventListeners = () => {
         for (let name of ["click","mouseover","mouseout","dblclick","mousedown","mouseup","mousemove"]) {
             for (let item of this.items) {
                 this.listeners[name+"_"+item.id] = (event) => {
-                    EventsManager.emit(name, this, createEvent(event, {
-                        container: this.container, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
+                    EventsManager.emit(name, this.origEvent.target, createEvent(event, {
+                        container: this.container, owner:this, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
                     }))
                     setTimeout(() => {
                         if (["click", "mousedown", "mouseup", "dblclick"].indexOf(name) !== -1) {
@@ -121,6 +229,13 @@ export default function Menu(items,container,eventType=null) {
             }
         }
     }
+
+    /**
+     * @ignore
+     * Internal method that used to adjust image size to match size of menu item text
+     * and correct width to respect aspect ratio and align all items correctly
+     * @param maxSize {number} Maximum width or height of image
+     */
     this.adjustImagesWidth = (maxSize) => {
         if (!this.panel) {
             return
@@ -135,6 +250,9 @@ export default function Menu(items,container,eventType=null) {
         }
     }
 
+    /**
+     * Method shows menu
+     */
     this.show = () => {
         if (!this.panel) {
             return
@@ -156,28 +274,50 @@ export default function Menu(items,container,eventType=null) {
         }
     }
 
+    /**
+     * Method hides menu
+     */
     this.hide = () => {
         if (this.panel) {
             this.panel.style.display = 'none';
         }
     }
 
+    /**
+     * Method used to dynamically add item to menu
+     * @param id {string} Unique ID of item
+     * @param title {string} Text of menu item
+     * @param image {string} URL of menu item image (optional)
+     */
     this.addItem = (id,title,image=null) => {
         const item = {id,title};
         if (image) {
             item.image = image;
         }
         this.items.push(item);
-        this.drawItems();
+        this.drawMenu();
     }
 
+    /**
+     * Method used to remove menu item
+     * @param id {string} ID of item to remove
+     */
     this.removeItem = (id) => {
         this.items.splice(this.items.findIndex(item => item.id === id),1);
-        this.drawItems();
+        this.drawMenu();
     }
 
+    /**
+     * Method used to return HTML node of menu item by ID
+     * @param id {string} ID of menu item
+     * @returns {HTMLDivElement} DIV html element of menu item
+     */
     this.findItemById = (id) => Array.from(this.panel.querySelectorAll("div")).find(item => item.id === id);
 
+    /**
+     * Method used to set unique ID of this menu panel.
+     * @param id {string} ID to set
+     */
     this.setId = (id) => this.panel.id = id;
 
     /**
@@ -192,7 +332,7 @@ export default function Menu(items,container,eventType=null) {
             this.subscriptions[eventName] = [];
         }
         const listener = EventsManager.subscribe(eventName, (event) => {
-            if (event.target === this) {
+            if (event.owner === this) {
                 handler(event)
             }
         });
@@ -215,14 +355,32 @@ export default function Menu(items,container,eventType=null) {
         EventsManager.unsubscribe(eventName,listener)
     }
 
+    /**
+     * Method used to subscribe to menu item event.
+     * @param eventName {string} Name of event to subscribe (click, mouseover, mouseout or other)
+     * @param handler {function} Handler function that will execute on event. Function receives `event` argument
+     * which is a standard MouseEvent with all properties and in addition, contains the following important fields:
+     * `itemId` - ID of menu item that triggered this event, `cursorX` - X position of mouse cursor on container in a
+     * moment the menu appeared, `cursorY` - Y position of mouse cursor on container in a moment the menu appeared.
+     * @returns {function} Returns a created listener object which can be used later to unsubscribe from this event
+     */
     this.on = (eventName,handler) => {
-        this.addEventListener(eventName, handler)
+        return this.addEventListener(eventName, handler)
     }
 
+    /**
+     * Method used to unsubscribe from menu item event
+     * @param eventName {string} name of event to unsubscribe, (click, mouseover, mouseout or other)
+     * @param handler {function} event handler to remove from subscriptions, that previously returned by `on` function
+     */
     this.off = (eventName,handler) => {
         this.removeEventListener(eventName, handler);
     }
 
+    /**
+     * Method used to unsubscribe from all events, previously subscribed using `on` or `addEventListener`
+     * methods
+     */
     this.removeAllEventListeners = () => {
         for (let eventName in this.subscriptions) {
             for (let handler of this.subscriptions[eventName]) {
@@ -242,6 +400,10 @@ export default function Menu(items,container,eventType=null) {
         }
     }
 
+    /**
+     * Method used to destroy menu: removes all subscriptions
+     * and menu panel element from DOM.
+     */
     this.destroy = () => {
         this.removeAllEventListeners();
         this.items = [];
@@ -255,3 +417,5 @@ export default function Menu(items,container,eventType=null) {
         this.panel = null;
     }
 }
+
+export default Menu;

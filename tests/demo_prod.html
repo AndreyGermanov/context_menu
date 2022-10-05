@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page for Cypress tests</title>
+</head>
+<body>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+<div id="item" style="background-color: #cccccc;width:300px">Click me</div>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<script src="../context_menu.umd.cjs"></script>
+<script>
+    const menu = Menus.create([
+        {id:"item1",title:"The first item",image:"http://localhost:5173/tests/about.jpg"},
+        {id:"item2",title:"The second item",image:"http://localhost:5173/tests/about.jpg"},
+        {id:"item3",title:"The third item",image:"http://localhost:5173/tests/about.jpg"}
+    ],document.querySelector("#item"));
+    menu.addItem("item4","New","http://localhost:5173/tests/chatter.png");
+    menu.addEventListener("click",(event) => {
+        switch(event.itemId) {
+            case "item1":
+                console.log("trigger 1");
+                break;
+            case "item2":
+                console.log("trigger 2");
+                break;
+            case "item3":
+                console.log("trigger 3");
+                break;
+            case "item4":
+                console.log("trigger 4");
+                break;
+        }
+    })
+</script>
+</body>
+</html>
