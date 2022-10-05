@@ -10,7 +10,11 @@ A JavaScript library to create a context menus for your web pages.
 
 ## Install
 
-Download the library from [here](https://code.germanov.dev/context_menu/context_menu.umd.cjs).
+Download the library file [context_menu.umd.cjs](https://code.germanov.dev/context_menu/context_menu.umd.cjs) and include it to your web page:
+
+```html
+<script src="context_menu.umd.cjs"></script>
+```
 
 or, if you develop project with JavaScript framework, you can install it using NPM:
 
