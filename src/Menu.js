@@ -190,6 +190,9 @@ function Menu(items,container,eventType=null) {
         let listeners = {};
         for (let item of imgItems) {
             const img = new Image();
+            if (!this.panel) {
+                continue;
+            }
             const span = this.panel.querySelector("#"+item.id+" > span");
             img.style.display = 'none';
             const url = await blobToDataURL(await (await fetch(item.image)).blob());
