@@ -89,6 +89,9 @@ function MenuStylesHelper(menu) {
         if (!itemDiv) {
             return
         }
+        itemDiv.style.display = 'flex';
+        itemDiv.style.flexDirection = 'row';
+        itemDiv.style.alignItems = 'center';
         if (this.itemsCssClassesById[item.id] && typeof(this.itemsCssClassesById[item.id]) == "object" &&
             this.itemsCssClassesById[item.id][ItemParts.ITEM]) {
             itemDiv.className = this.itemsCssClassesById[item.id][ItemParts.ITEM]
@@ -96,9 +99,6 @@ function MenuStylesHelper(menu) {
             itemDiv.className = this.itemCssClass || "";
         } else {
             itemDiv.className = "";
-            itemDiv.style.display = 'flex';
-            itemDiv.style.flexDirection = 'row';
-            itemDiv.style.alignItems = 'center';
             itemDiv.style.paddingTop = "2px";
             itemDiv.style.paddingLeft = "3px";
             itemDiv.style.paddingRight = "3px";
@@ -169,7 +169,6 @@ function MenuStylesHelper(menu) {
      */
     this.setPanelClass = (className=null) => {
         this.panelCssClass = className || "";
-        this.menu.drawMenu();
     }
 
     /**
@@ -181,11 +180,9 @@ function MenuStylesHelper(menu) {
     this.setItemClass = (className=null,id=null) => {
         if (id) {
             this.setClassForItem(id,ItemParts.ITEM, className);
-            this.menu.drawMenu();
             return
         }
         this.itemCssClass = className || "";
-        this.menu.drawMenu();
     }
 
     /**
@@ -197,11 +194,9 @@ function MenuStylesHelper(menu) {
     this.setTextClass = (className=null,id=null) => {
         if (id) {
             this.setClassForItem(id,ItemParts.TEXT, className);
-            this.menu.drawMenu();
             return
         }
         this.itemTextCssClass = className || "";
-        this.menu.drawMenu();
     }
 
     /**
@@ -213,11 +208,9 @@ function MenuStylesHelper(menu) {
     this.setImageClass = (className=null,id=null) => {
         if (id) {
             this.setClassForItem(id,ItemParts.IMAGE,className);
-            this.menu.drawMenu();
             return
         }
         this.itemImageCssClass = className || "";
-        this.menu.drawMenu();
     }
 
     /**
