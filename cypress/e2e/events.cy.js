@@ -25,7 +25,6 @@ describe('Events tests', () => {
       let trigger6 = false;
       await menu.drawMenu();
       menu.on("click", (event) => {
-        console.log("CLICK");
         assert.equal(event.owner,menu,"Should have menu object as an event owner");
         assert.equal(event.target,div,"Should have div element as an event target");
         assert.equal(event.cursorX,10,"Should save cursor X position oaf a moment when menu panel appeared");
@@ -98,6 +97,20 @@ describe('Events tests', () => {
           })
         })
       })
+    });
+  })
+  it("Should keep collection of menus (add menus to collection on create and remove on destroy",() => {
+    cy.visit('http://localhost:5173/tests/index.html').then(async() => {
+      Menus.menus = [];
+      const div = Cypress.$("#app").toArray()[0];
+      const menu1 = Menus.create([{id: "item1", title: "Item 1"}, {id: "item2", title: "Item 2"}], div)
+      assert.equal(Menus.menus.length, 1, "Should add first menu to collection");
+      const menu2 = Menus.create([{id: "item1", title: "Item 1"}, {id: "item2", title: "Item 2"}], div);
+      assert.equal(Menus.menus.length, 2, "Should add second menu to collection");
+      menu1.destroy();
+      assert.equal(Menus.menus.length, 1, "Should remove first menu from collection");
+      menu2.destroy();
+      assert.equal(Menus.menus.length, 0, "Should remove second menu from collection");
     });
   })
 })

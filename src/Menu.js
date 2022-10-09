@@ -109,11 +109,7 @@ function Menu(items,container,eventType=null) {
             this.onEvent(event);
             return false;
         });
-        document.addEventListener("mouseup", (event) => {
-            if (event.button!==2) {
-                this.hide();
-            }
-        })
+        EventsManager.emit(MenuEvents.CREATE,this);
         return this;
     }
 
@@ -156,7 +152,9 @@ function Menu(items,container,eventType=null) {
         }
         this.setStyles();
         this.drawImages();
+        this.setStyles();
         this.setItemsEventListeners();
+        this.panel.style.display = 'none'
     }
 
     /**
@@ -256,6 +254,9 @@ function Menu(items,container,eventType=null) {
      * Method shows menu
      */
     this.show = () => {
+        if (!this.container) {
+            return
+        }
         this.drawMenu();
         if (!this.panel) {
             return
@@ -266,7 +267,6 @@ function Menu(items,container,eventType=null) {
         this.panel.style.left = left +"px";
         this.panel.style.top = top+"px";
         this.panel.style.zIndex = "10000";
-        this.panel.style.visibility = 'visible';
         this.panel.style.position = 'absolute';
         if (left+this.panel.clientWidth > window.innerWidth) {
             left = window.innerWidth - this.panel.clientWidth - 10;
@@ -276,6 +276,7 @@ function Menu(items,container,eventType=null) {
             top = top - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
             this.panel.style.top = top +"px";
         }
+        EventsManager.emit(MenuEvents.SHOW,this);
     }
 
     /**
@@ -417,7 +418,18 @@ function Menu(items,container,eventType=null) {
             this.panel.innerHTML = "";
         }
         this.panel = null;
+        EventsManager.emit(MenuEvents.DESTROY,this);
     }
+}
+
+/**
+ * Enumeration of menu events
+ * @enum
+ */
+export const MenuEvents = {
+    CREATE: "create",
+    DESTROY: "destroy",
+    SHOW: "show"
 }
 
 export default Menu;

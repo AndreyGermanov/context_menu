@@ -199,6 +199,7 @@ and menu panel element from DOM.
 
 * [Menus](#Menus)
     * [new Menus()](#new_Menus_new)
+    * [.menus](#Menus+menus) : <code>array</code>
     * [.create(items, container, eventName)](#Menus+create) ⇒ [<code>Menu</code>](#Menu)
 
 <a name="new_Menus_new"></a>
@@ -206,6 +207,12 @@ and menu panel element from DOM.
 ### new Menus()
 Factory class for menus. Used to construct new context menus.
 
+<a name="Menus+menus"></a>
+
+### menus.menus : <code>array</code>
+Collection of all created menus
+
+**Kind**: instance property of [<code>Menus</code>](#Menus)  
 <a name="Menus+create"></a>
 
 ### menus.create(items, container, eventName) ⇒ [<code>Menu</code>](#Menu)
@@ -336,6 +343,12 @@ or only for menu item with specified `id`
 | className | <code>string</code> | CSS class to apply |
 | id | <code>string</code> | ID of item or null |
 
+<a name="MenuEvents"></a>
+
+## MenuEvents
+Enumeration of menu events
+
+**Kind**: global enum  
 <a name="ItemParts"></a>
 
 ## ItemParts
