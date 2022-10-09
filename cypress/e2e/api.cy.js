@@ -8,8 +8,9 @@ describe('Menu API tests', () => {
       cy.wait(100).then(() => {
         assert.equal(menu.panel.querySelectorAll("div").length,0,"Should be empty menu without items");
         menu.addItem("item1","Item 1","http://localhost:5173/tests/about.jpg");
-        cy.wait(100).then(() => {
-          assert.equal(menu.panel.querySelectorAll("div").length,1,"Should be empty menu without items");
+        menu.show();
+        cy.wait(200).then(() => {
+          assert.equal(menu.panel.querySelectorAll("div").length,2,"Should be empty menu without items");
         })
       });
     });
@@ -21,9 +22,11 @@ describe('Menu API tests', () => {
       cy.wait(100).then(() => {
         assert.equal(menu.panel.querySelectorAll("div").length,0,"Should be empty menu without items");
         menu.addItem("item1","Item 1","http://localhost:5173/tests/about.jpg");
+        menu.show();
         cy.wait(100).then(() => {
-          assert.equal(menu.panel.querySelectorAll("div").length,1,"Should be empty menu without items");
+          assert.equal(menu.panel.querySelectorAll("div").length,2,"Should be empty menu without items");
           menu.removeItem("item1");
+          menu.drawMenu();
           cy.wait(100).then(() => {
             assert.equal(menu.panel.querySelectorAll("div").length, 0, "Should be empty menu without items");
           });
