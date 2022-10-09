@@ -137,43 +137,26 @@ function Menu(items,container,eventType=null) {
      * Method used to construct menu HTML element with it items
      */
     this.drawMenu = () => {
-        return new Promise(async(resolve) => {
-            try {
-                document.body.removeChild(this.panel);
-            } catch (err) {}
-            this.panel = document.createElement("div");
-            this.panel.style.visibility = 'hidden';
-            if (!this.overflowY && document.body.style.overflowY !== "clip") {
-                this.overflowY = document.body.style.overflowY;
+        try {
+            document.body.removeChild(this.panel);
+        } catch (err) {}
+        this.panel = document.createElement("div");
+        document.body.appendChild(this.panel);
+        for (let item of this.items) {
+            if (this.panel.querySelector("#"+item.id)) {
+                continue;
             }
-            document.body.style.overflowY = 'clip';
-            document.body.appendChild(this.panel);
-            for (let item of this.items) {
-                if (this.panel.querySelector("#"+item.id)) {
-                    continue;
-                }
-                const div = document.createElement("div");
-                div.id = item.id;
-                div.style.cursor = 'pointer';
-                const span = document.createElement("span");
-                span.innerHTML = item.title;
-                div.appendChild(span);
-                this.panel.appendChild(div);
-            }
-            this.setStyles();
-            await this.drawImages();
-            setTimeout(() => {
-                this.setItemsEventListeners();
-                this.adjustImagesWidth(this.maxImageHeight);
-                this.setStyles();
-                if (this.panel) {
-                    this.panel.style.display = 'none';
-                    this.panel.style.visibility = 'visible';
-                    document.body.style.overflowY = this.overflowY;
-                    resolve()
-                }
-            },100)
-        })
+            const div = document.createElement("div");
+            div.id = item.id;
+            div.style.cursor = 'pointer';
+            const span = document.createElement("span");
+            span.innerHTML = item.title;
+            div.appendChild(span);
+            this.panel.appendChild(div);
+        }
+        this.setStyles();
+        this.drawImages();
+        this.setItemsEventListeners();
     }
 
     /**
@@ -181,13 +164,12 @@ function Menu(items,container,eventType=null) {
      * Method used to inject images to menu items
      * while constructing them
      */
-    this.drawImages = async() => {
+    this.drawImages = () => {
         if (!this.panel) {
             return
         }
         const imgItems = this.items.filter(item => item.image && typeof(item.image)!== "undefined");
         this.maxImageHeight = 0;
-        let listeners = {};
         for (let item of imgItems) {
             const img = new Image();
             if (!this.panel) {
@@ -195,28 +177,28 @@ function Menu(items,container,eventType=null) {
             }
             const span = this.panel.querySelector("#"+item.id+" > span");
             img.style.display = 'none';
-            const url = await blobToDataURL(await (await fetch(item.image)).blob());
-            img.src = url;
-            listeners[item.id] = () => {
-                if (!this.panel) {
-                    return
-                }
-                img.height = this.panel.querySelector("#" + item.id).clientHeight;
-                if (img.height > this.maxImageHeight) {
-                    this.maxImageHeight = img.height;
-                }
-                img.style.verticalAlign = "middle";
-                img.style.marginRight = "5px";
-                img.style.display = '';
-                img.removeEventListener("load", listeners[item.id]);
+            img.src = item.image;
+            if (!this.panel) {
+                return
             }
-            img.addEventListener("load",listeners[item.id]);
-            try {
-                if (!this.panel.querySelector("#"+item.id+" img")) {
-                    this.panel.querySelector("#" + item.id).insertBefore(img, span);
-                }
-            } catch (err) {}
+            const div = document.createElement("div");
+            div.style.marginRight = '5px';
+            div.style.display = 'flex';
+            div.style.flexDirection = 'row';
+            div.style.justifyContent = 'center';
+            div.style.alignItems = 'center';
+            img.height = this.panel.querySelector("#" + item.id).clientHeight;
+            if (img.height > this.maxImageHeight) {
+                this.maxImageHeight = img.height;
+            }
+            img.style.verticalAlign = "middle";
+            img.style.display = '';
+            div.appendChild(img)
+            if (!this.panel.querySelector("#"+item.id+" div")) {
+                this.panel.querySelector("#" + item.id).insertBefore(div, span);
+            }
         }
+        this.adjustImagesWidth();
     }
 
     /**
@@ -236,7 +218,9 @@ function Menu(items,container,eventType=null) {
                     }))
                     setTimeout(() => {
                         if (["click", "mousedown", "mouseup", "dblclick"].indexOf(name) !== -1) {
-                            this.hide();
+                            if (event.button !== 2) {
+                                this.hide();
+                            }
                         }
                     }, 100)
                 };
@@ -251,34 +235,37 @@ function Menu(items,container,eventType=null) {
      * and correct width to respect aspect ratio and align all items correctly
      * @param maxSize {number} Maximum width or height of image
      */
-    this.adjustImagesWidth = (maxSize) => {
+    this.adjustImagesWidth = () => {
         if (!this.panel) {
             return
         }
-        for (let img of this.panel.querySelectorAll("img")) {
-            const canvas = document.createElement("canvas");
-            canvas.width = maxSize;
-            canvas.height = maxSize;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img,Math.round(maxSize/2-img.width/2),0,img.width,img.height);
-            img.src = canvas.toDataURL();
+        let maxSize = 0;
+        for (let item of this.items) {
+            if (this.panel.querySelector("#"+item.id).clientHeight > maxSize) {
+                maxSize = this.panel.querySelector("#"+item.id).clientHeight;
+            }
         }
+        for (let img of this.panel.querySelectorAll("img")) {
+            img.parentNode.style.width = maxSize+"px";
+            img.parentNode.style.height = maxSize+"px";
+        }
+
     }
 
     /**
      * Method shows menu
      */
-    this.show = async() => {
-        await this.drawMenu();
+    this.show = () => {
+        this.drawMenu();
         if (!this.panel) {
             return
         }
+        this.panel.style.display = '';
         let left = this.cursorX;
         let top = this.cursorY;
         this.panel.style.left = left +"px";
         this.panel.style.top = top+"px";
         this.panel.style.zIndex = "10000";
-        this.panel.style.display = '';
         this.panel.style.visibility = 'visible';
         this.panel.style.position = 'absolute';
         if (left+this.panel.clientWidth > window.innerWidth) {
@@ -312,7 +299,6 @@ function Menu(items,container,eventType=null) {
             item.image = image;
         }
         this.items.push(item);
-        this.drawMenu();
     }
 
     /**
@@ -321,7 +307,6 @@ function Menu(items,container,eventType=null) {
      */
     this.removeItem = (id) => {
         this.items.splice(this.items.findIndex(item => item.id === id),1);
-        this.drawMenu();
     }
 
     /**

@@ -1,4 +1,4 @@
-function d(n) {
+function u(n) {
   this.menu = n, this.panelCssClass = "", this.itemCssClass = "", this.itemTextCssClass = "", this.itemImageCssClass = "", this.itemsCssClassesById = {}, this.setStyles = () => {
     if (!!this.menu.panel) {
       this.panelCssClass ? this.menu.panel.className = this.panelCssClass : (this.menu.panel.style.padding = "3px", this.menu.panel.style.borderStyle = "solid", this.menu.panel.style.borderColor = "#dddddd", this.menu.panel.style.borderWidth = "1px", this.menu.panel.style.backgroundColor = "#eeeeee", this.menu.panel.className = "");
@@ -9,7 +9,7 @@ function d(n) {
     this.setItemDivStyles(t), this.setItemSpanStyles(t), this.setItemImageStyles(t);
   }, this.setItemDivStyles = (t) => {
     const e = this.menu.panel.querySelector("#" + t.id);
-    !e || (this.itemsCssClassesById[t.id] && typeof this.itemsCssClassesById[t.id] == "object" && this.itemsCssClassesById[t.id][h.ITEM] ? e.className = this.itemsCssClassesById[t.id][h.ITEM] : this.itemCssClass ? e.className = this.itemCssClass || "" : (e.className = "", e.style.display = "flex", e.style.flexDirection = "row", e.style.alignItems = "center", e.style.paddingTop = "2px", e.style.paddingLeft = "3px", e.style.paddingRight = "3px", e.addEventListener("mouseover", () => {
+    !e || (e.style.display = "flex", e.style.flexDirection = "row", e.style.alignItems = "center", this.itemsCssClassesById[t.id] && typeof this.itemsCssClassesById[t.id] == "object" && this.itemsCssClassesById[t.id][h.ITEM] ? e.className = this.itemsCssClassesById[t.id][h.ITEM] : this.itemCssClass ? e.className = this.itemCssClass || "" : (e.className = "", e.style.paddingTop = "2px", e.style.paddingLeft = "3px", e.style.paddingRight = "3px", e.addEventListener("mouseover", () => {
       e.style.backgroundColor = "#0066CC", e.style.color = "white";
     }), e.addEventListener("mouseout", () => {
       e.style.backgroundColor = "transparent", e.style.color = "black";
@@ -27,25 +27,25 @@ function d(n) {
     const s = e.querySelector("img");
     s && (this.itemsCssClassesById[t.id] && typeof this.itemsCssClassesById[t.id] == "object" && this.itemsCssClassesById[t.id][h.IMAGE] ? s.className = this.itemsCssClassesById[t.id][h.IMAGE] : this.itemImageCssClass ? s.className = this.itemImageCssClass : s.className = "");
   }, this.setPanelClass = (t = null) => {
-    this.panelCssClass = t || "", this.menu.drawMenu();
+    this.panelCssClass = t || "";
   }, this.setItemClass = (t = null, e = null) => {
     if (e) {
-      this.setClassForItem(e, h.ITEM, t), this.menu.drawMenu();
+      this.setClassForItem(e, h.ITEM, t);
       return;
     }
-    this.itemCssClass = t || "", this.menu.drawMenu();
+    this.itemCssClass = t || "";
   }, this.setTextClass = (t = null, e = null) => {
     if (e) {
-      this.setClassForItem(e, h.TEXT, t), this.menu.drawMenu();
+      this.setClassForItem(e, h.TEXT, t);
       return;
     }
-    this.itemTextCssClass = t || "", this.menu.drawMenu();
+    this.itemTextCssClass = t || "";
   }, this.setImageClass = (t = null, e = null) => {
     if (e) {
-      this.setClassForItem(e, h.IMAGE, t), this.menu.drawMenu();
+      this.setClassForItem(e, h.IMAGE, t);
       return;
     }
-    this.itemImageCssClass = t || "", this.menu.drawMenu();
+    this.itemImageCssClass = t || "";
   }, this.setClassForItem = (t, e, s) => {
     (!this.itemsCssClassesById[t] || typeof this.itemsCssClassesById[t] > "u") && (this.itemsCssClassesById[t] = {}), this.itemsCssClassesById[t][e] = s;
   };
@@ -89,105 +89,99 @@ function c() {
     this.subscriptions = {};
   };
 }
-const o = new c(), p = (n, t = {}) => {
+const a = new c(), d = (n, t = {}) => {
   const e = {};
   for (let s in n)
     s !== "type" && s !== "target" && (e[s] = n[s]);
   return Object.keys(t).forEach((s) => {
     e[s] = t[s];
   }), e;
-}, m = (n) => new Promise((t) => {
-  const e = new FileReader();
-  e.onload = function(s) {
-    t(s.target.result);
-  }, e.readAsDataURL(n);
-});
-function f(n, t, e = null) {
-  this.panel = null, this.container = t, this.items = n, this.event = e || "contextmenu", this.listeners = {}, this.origEvent = null, this.cursorX = 0, this.cursorY = 0, this.overflowY = "", this.maxImageHeight = 0, this.subscriptions = {}, this.init = () => (Object.assign(this, new d(this)), this.container.addEventListener(this.event, (s) => (this.onEvent(s), !1)), document.addEventListener("mouseup", (s) => {
+};
+function p(n, t, e = null) {
+  this.panel = null, this.container = t, this.items = n, this.event = e || "contextmenu", this.listeners = {}, this.origEvent = null, this.cursorX = 0, this.cursorY = 0, this.overflowY = "", this.maxImageHeight = 0, this.subscriptions = {}, this.init = () => (Object.assign(this, new u(this)), this.container.addEventListener(this.event, (s) => (this.onEvent(s), !1)), document.addEventListener("mouseup", (s) => {
     s.button !== 2 && this.hide();
   }), this), this.onEvent = (s) => {
     this.origEvent = s, s.preventDefault(), s.stopPropagation(), s.cancelBubble = !0, this.cursorX = s.pageX, this.cursorY = s.pageY, this.show();
-  }, this.drawMenu = () => new Promise(async (s) => {
+  }, this.drawMenu = () => {
     try {
       document.body.removeChild(this.panel);
     } catch {
     }
-    this.panel = document.createElement("div"), this.panel.style.visibility = "hidden", !this.overflowY && document.body.style.overflowY !== "clip" && (this.overflowY = document.body.style.overflowY), document.body.style.overflowY = "clip", document.body.appendChild(this.panel);
-    for (let i of this.items) {
-      if (this.panel.querySelector("#" + i.id))
+    this.panel = document.createElement("div"), document.body.appendChild(this.panel);
+    for (let s of this.items) {
+      if (this.panel.querySelector("#" + s.id))
         continue;
-      const l = document.createElement("div");
-      l.id = i.id, l.style.cursor = "pointer";
-      const r = document.createElement("span");
-      r.innerHTML = i.title, l.appendChild(r), this.panel.appendChild(l);
+      const i = document.createElement("div");
+      i.id = s.id, i.style.cursor = "pointer";
+      const l = document.createElement("span");
+      l.innerHTML = s.title, i.appendChild(l), this.panel.appendChild(i);
     }
-    this.setStyles(), await this.drawImages(), setTimeout(() => {
-      this.setItemsEventListeners(), this.adjustImagesWidth(this.maxImageHeight), this.setStyles(), this.panel && (this.panel.style.display = "none", this.panel.style.visibility = "visible", document.body.style.overflowY = this.overflowY, s());
-    }, 100);
-  }), this.drawImages = async () => {
+    this.setStyles(), this.drawImages(), this.setItemsEventListeners();
+  }, this.drawImages = () => {
     if (!this.panel)
       return;
-    const s = this.items.filter((l) => l.image && typeof l.image < "u");
+    const s = this.items.filter((i) => i.image && typeof i.image < "u");
     this.maxImageHeight = 0;
-    let i = {};
-    for (let l of s) {
-      const r = new Image(), a = this.panel.querySelector("#" + l.id + " > span");
-      r.style.display = "none";
-      const u = await m(await (await fetch(l.image)).blob());
-      r.src = u, i[l.id] = () => {
-        !this.panel || (r.height = this.panel.querySelector("#" + l.id).clientHeight, r.height > this.maxImageHeight && (this.maxImageHeight = r.height), r.style.verticalAlign = "middle", r.style.marginRight = "5px", r.style.display = "", r.removeEventListener("load", i[l.id]));
-      }, r.addEventListener("load", i[l.id]);
-      try {
-        this.panel.querySelector("#" + l.id + " img") || this.panel.querySelector("#" + l.id).insertBefore(r, a);
-      } catch {
-      }
+    for (let i of s) {
+      const l = new Image();
+      if (!this.panel)
+        continue;
+      const r = this.panel.querySelector("#" + i.id + " > span");
+      if (l.style.display = "none", l.src = i.image, !this.panel)
+        return;
+      const o = document.createElement("div");
+      o.style.marginRight = "5px", o.style.display = "flex", o.style.flexDirection = "row", o.style.justifyContent = "center", o.style.alignItems = "center", l.height = this.panel.querySelector("#" + i.id).clientHeight, l.height > this.maxImageHeight && (this.maxImageHeight = l.height), l.style.verticalAlign = "middle", l.style.display = "", o.appendChild(l), this.panel.querySelector("#" + i.id + " div") || this.panel.querySelector("#" + i.id).insertBefore(o, r);
     }
+    this.adjustImagesWidth();
   }, this.setItemsEventListeners = () => {
     for (let s of ["click", "mouseover", "mouseout", "dblclick", "mousedown", "mouseup", "mousemove"])
       for (let i of this.items)
         this.listeners[s + "_" + i.id] = (l) => {
-          !this.origEvent || (o.emit(s, this.origEvent.target, p(l, {
+          !this.origEvent || (a.emit(s, this.origEvent.target, d(l, {
             container: this.container,
             owner: this,
             cursorX: this.cursorX,
             cursorY: this.cursorY,
             itemId: i.id
           })), setTimeout(() => {
-            ["click", "mousedown", "mouseup", "dblclick"].indexOf(s) !== -1 && this.hide();
+            ["click", "mousedown", "mouseup", "dblclick"].indexOf(s) !== -1 && l.button !== 2 && this.hide();
           }, 100));
         }, this.panel.querySelector("#" + i.id).addEventListener(s, this.listeners[s + "_" + i.id]);
-  }, this.adjustImagesWidth = (s) => {
-    if (!!this.panel)
-      for (let i of this.panel.querySelectorAll("img")) {
-        const l = document.createElement("canvas");
-        l.width = s, l.height = s, l.getContext("2d").drawImage(i, Math.round(s / 2 - i.width / 2), 0, i.width, i.height), i.src = l.toDataURL();
-      }
-  }, this.show = async () => {
-    if (await this.drawMenu(), !this.panel)
+  }, this.adjustImagesWidth = () => {
+    if (!this.panel)
       return;
+    let s = 0;
+    for (let i of this.items)
+      this.panel.querySelector("#" + i.id).clientHeight > s && (s = this.panel.querySelector("#" + i.id).clientHeight);
+    for (let i of this.panel.querySelectorAll("img"))
+      i.parentNode.style.width = s + "px", i.parentNode.style.height = s + "px";
+  }, this.show = () => {
+    if (this.drawMenu(), !this.panel)
+      return;
+    this.panel.style.display = "";
     let s = this.cursorX, i = this.cursorY;
-    this.panel.style.left = s + "px", this.panel.style.top = i + "px", this.panel.style.zIndex = "10000", this.panel.style.display = "", this.panel.style.visibility = "visible", this.panel.style.position = "absolute", s + this.panel.clientWidth > window.innerWidth && (s = window.innerWidth - this.panel.clientWidth - 10, this.panel.style.left = s + "px"), this.origEvent && this.origEvent.clientY + this.panel.clientHeight > window.innerHeight && (i = i - (window.innerHeight + this.panel.clientHeight - 20) + this.origEvent.clientY, this.panel.style.top = i + "px");
+    this.panel.style.left = s + "px", this.panel.style.top = i + "px", this.panel.style.zIndex = "10000", this.panel.style.visibility = "visible", this.panel.style.position = "absolute", s + this.panel.clientWidth > window.innerWidth && (s = window.innerWidth - this.panel.clientWidth - 10, this.panel.style.left = s + "px"), this.origEvent && this.origEvent.clientY + this.panel.clientHeight > window.innerHeight && (i = i - (window.innerHeight + this.panel.clientHeight - 20) + this.origEvent.clientY, this.panel.style.top = i + "px");
   }, this.hide = () => {
     this.panel && (this.panel.style.display = "none");
   }, this.addItem = (s, i, l = null) => {
     const r = { id: s, title: i };
-    l && (r.image = l), this.items.push(r), this.drawMenu();
+    l && (r.image = l), this.items.push(r);
   }, this.removeItem = (s) => {
-    this.items.splice(this.items.findIndex((i) => i.id === s), 1), this.drawMenu();
+    this.items.splice(this.items.findIndex((i) => i.id === s), 1);
   }, this.findItemById = (s) => Array.from(this.panel.querySelectorAll("div")).find((i) => i.id === s), this.setId = (s) => this.panel.id = s, this.addEventListener = (s, i) => {
     typeof this.subscriptions[s] > "u" && (this.subscriptions[s] = []);
-    const l = o.subscribe(s, (r) => {
+    const l = a.subscribe(s, (r) => {
       r.owner === this && i(r);
     });
     return this.subscriptions[s].push(l), l;
   }, this.removeEventListener = (s, i) => {
-    this.subscriptions[s] && typeof this.subscriptions[s] < "u" && this.subscriptions[s].splice(this.subscriptions[s].indexOf(i), 1), o.unsubscribe(s, i);
+    this.subscriptions[s] && typeof this.subscriptions[s] < "u" && this.subscriptions[s].splice(this.subscriptions[s].indexOf(i), 1), a.unsubscribe(s, i);
   }, this.on = (s, i) => this.addEventListener(s, i), this.off = (s, i) => {
     this.removeEventListener(s, i);
   }, this.removeAllEventListeners = () => {
     for (let s in this.subscriptions)
       for (let i of this.subscriptions[s])
-        o.unsubscribe(s, i);
+        a.unsubscribe(s, i);
     if (this.subscriptions = {}, !!this.panel)
       for (let s in this.listeners) {
         const [i, l] = s.split("_"), r = this.panel.querySelector("#" + l);
@@ -202,14 +196,14 @@ function f(n, t, e = null) {
     this.panel && (this.panel.innerHTML = ""), this.panel = null;
   };
 }
-function y() {
-  this.create = (n, t, e) => new f(n, t, e).init();
+function f() {
+  this.create = (n, t, e) => new p(n, t, e).init();
 }
-const b = new y();
+const m = new f();
 try {
-  window.Menus = b;
+  window.Menus = m;
 } catch {
 }
 export {
-  b as Menus
+  m as Menus
 };
