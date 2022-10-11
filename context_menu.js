@@ -98,7 +98,7 @@ const o = {
   }), e;
 };
 function f(n, t, e = null) {
-  this.panel = null, this.container = t, this.items = n, this.event = e || "contextmenu", this.listeners = {}, this.origEvent = null, this.cursorX = 0, this.cursorY = 0, this.overflowY = "", this.maxImageHeight = 0, this.subscriptions = {}, this.init = () => (Object.assign(this, new d(this)), this.container.addEventListener(this.event, (s) => (this.onEvent(s), !1)), h.emit(a.CREATE, this), this), this.onEvent = (s) => {
+  this.panel = null, this.container = t, this.items = n, this.event = e || "contextmenu", this.listeners = {}, this.origEvent = null, this.cursorX = 0, this.cursorY = 0, this.overflowY = "", this.maxImageHeight = 0, this.subscriptions = {}, this.init = () => (Object.assign(this, new d(this)), this.container.addEventListener(this.event, (s) => (this.onEvent(s), !1)), h.emit(a.CREATE, this, { owner: this }), this), this.onEvent = (s) => {
     this.origEvent = s, s.preventDefault(), s.stopPropagation(), s.cancelBubble = !0, this.cursorX = s.pageX, this.cursorY = s.pageY, this.show();
   }, this.drawMenu = () => {
     try {
@@ -133,18 +133,23 @@ function f(n, t, e = null) {
     this.adjustImagesWidth();
   }, this.setItemsEventListeners = () => {
     for (let s of ["click", "mouseover", "mouseout", "dblclick", "mousedown", "mouseup", "mousemove"])
-      for (let i of this.items)
-        this.listeners[s + "_" + i.id] = (l) => {
-          !this.origEvent || (h.emit(s, this.origEvent.target, p(l, {
-            container: this.container,
-            owner: this,
-            cursorX: this.cursorX,
-            cursorY: this.cursorY,
-            itemId: i.id
-          })), setTimeout(() => {
-            ["click", "mousedown", "mouseup", "dblclick"].indexOf(s) !== -1 && l.button !== 2 && this.hide();
-          }, 100));
-        }, this.panel.querySelector("#" + i.id).addEventListener(s, this.listeners[s + "_" + i.id]);
+      this.setListenersForMouseEvent(s);
+  }, this.setListenersForMouseEvent = (s) => {
+    for (let i of this.items)
+      this.setListenerForItem(s, i);
+  }, this.setListenerForItem = (s, i) => {
+    const l = (r) => {
+      !this.origEvent || (h.emit(s, this.origEvent.target, p(r, {
+        container: this.container,
+        owner: this,
+        cursorX: this.cursorX,
+        cursorY: this.cursorY,
+        itemId: i.id
+      })), setTimeout(() => {
+        ["click", "mousedown", "mouseup", "dblclick"].indexOf(s) !== -1 && r.button !== 2 && this.hide();
+      }, 100));
+    };
+    this.listeners[s + "_" + i.id] = l, this.panel.querySelector("#" + i.id).addEventListener(s, l);
   }, this.adjustImagesWidth = () => {
     if (!this.panel)
       return;
@@ -154,18 +159,19 @@ function f(n, t, e = null) {
     for (let i of this.panel.querySelectorAll("img"))
       i.parentNode.style.width = s + "px", i.parentNode.style.height = s + "px";
   }, this.show = () => {
-    if (!this.container || (this.drawMenu(), !this.panel))
+    if (!this.container || (h.emit(a.SHOW, this, { owner: this }), this.drawMenu(), !this.panel))
       return;
     this.panel.style.display = "";
     let s = this.cursorX, i = this.cursorY;
-    this.panel.style.left = s + "px", this.panel.style.top = i + "px", this.panel.style.zIndex = "10000", this.panel.style.position = "absolute", s + this.panel.clientWidth > window.innerWidth && (s = window.innerWidth - this.panel.clientWidth - 10, this.panel.style.left = s + "px"), this.origEvent && this.origEvent.clientY + this.panel.clientHeight > window.innerHeight && (i = i - (window.innerHeight + this.panel.clientHeight - 20) + this.origEvent.clientY, this.panel.style.top = i + "px"), h.emit(a.SHOW, this);
+    this.panel.style.left = s + "px", this.panel.style.top = i + "px", this.panel.style.zIndex = "10000", this.panel.style.position = "absolute", s + this.panel.clientWidth > window.innerWidth && (s = window.innerWidth - this.panel.clientWidth - 10, this.panel.style.left = s + "px"), this.origEvent && this.origEvent.clientY + this.panel.clientHeight > window.innerHeight && (i = i - (window.innerHeight + this.panel.clientHeight - 20) + this.origEvent.clientY, this.panel.style.top = i + "px");
   }, this.hide = () => {
     this.panel && (this.panel.style.display = "none");
   }, this.addItem = (s, i, l = null) => {
     const r = { id: s, title: i };
     l && (r.image = l), this.items.push(r);
   }, this.removeItem = (s) => {
-    this.items.splice(this.items.findIndex((i) => i.id === s), 1);
+    const i = this.items.findIndex((l) => l.id === s);
+    i !== -1 && this.items.splice(i, 1);
   }, this.findItemById = (s) => Array.from(this.panel.querySelectorAll("div")).find((i) => i.id === s), this.setId = (s) => this.panel.id = s, this.addEventListener = (s, i) => {
     typeof this.subscriptions[s] > "u" && (this.subscriptions[s] = []);
     const l = h.subscribe(s, (r) => {
@@ -191,7 +197,7 @@ function f(n, t, e = null) {
       document.body.removeChild(this.panel);
     } catch {
     }
-    this.panel && (this.panel.innerHTML = ""), this.panel = null, h.emit(a.DESTROY, this);
+    this.panel && (this.panel.innerHTML = ""), this.panel = null, h.emit(a.DESTROY, this, { owner: this });
   };
 }
 const a = {

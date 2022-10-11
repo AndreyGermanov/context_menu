@@ -1,6 +1,6 @@
 import StylesHelper from "./MenuStylesHelper.js";
 import EventsManager from "./EventsManager.js";
-import {blobToDataURL, createEvent} from "./functions.js";
+import {createEvent} from "./functions.js";
 
 /**
  * Context menu panel object.
@@ -109,7 +109,7 @@ function Menu(items,container,eventType=null) {
             this.onEvent(event);
             return false;
         });
-        EventsManager.emit(MenuEvents.CREATE,this);
+        EventsManager.emit(MenuEvents.CREATE,this,{owner:this});
         return this;
     }
 
@@ -206,32 +206,49 @@ function Menu(items,container,eventType=null) {
      */
     this.setItemsEventListeners = () => {
         for (let name of ["click","mouseover","mouseout","dblclick","mousedown","mouseup","mousemove"]) {
-            for (let item of this.items) {
-                this.listeners[name+"_"+item.id] = (event) => {
-                    if (!this.origEvent) {
-                        return
-                    }
-                    EventsManager.emit(name, this.origEvent.target, createEvent(event, {
-                        container: this.container, owner:this, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
-                    }))
-                    setTimeout(() => {
-                        if (["click", "mousedown", "mouseup", "dblclick"].indexOf(name) !== -1) {
-                            if (event.button !== 2) {
-                                this.hide();
-                            }
-                        }
-                    }, 100)
-                };
-                this.panel.querySelector("#"+item.id).addEventListener(name, this.listeners[name+"_"+item.id])
-            }
+            this.setListenersForMouseEvent(name)
         }
+    }
+
+    /**
+     * Set event listeners for all menu items for specified mouse event
+     * @param eventName {string} Mouse event name (click,mousedown,mouseup ...)
+     */
+    this.setListenersForMouseEvent = (eventName) => {
+        for (let item of this.items) {
+            this.setListenerForItem(eventName,item)
+        }
+    }
+
+    /**
+     * Set mouse event listener for specified event for specified menu item
+     * @param eventName {string} Mouse event name (click,mousedown,mouseup ...)
+     * @param item {object} Menu item object
+     */
+    this.setListenerForItem = (eventName, item) => {
+        const listener = (event) => {
+            if (!this.origEvent) {
+                return
+            }
+            EventsManager.emit(eventName, this.origEvent.target, createEvent(event, {
+                container: this.container, owner:this, cursorX: this.cursorX, cursorY: this.cursorY, itemId: item.id
+            }))
+            setTimeout(() => {
+                if (["click", "mousedown", "mouseup", "dblclick"].indexOf(eventName) !== -1) {
+                    if (event.button !== 2) {
+                        this.hide();
+                    }
+                }
+            }, 100)
+        }
+        this.listeners[eventName+"_"+item.id] = listener;
+        this.panel.querySelector("#"+item.id).addEventListener(eventName, listener)
     }
 
     /**
      * @ignore
      * Internal method that used to adjust image size to match size of menu item text
      * and correct width to respect aspect ratio and align all items correctly
-     * @param maxSize {number} Maximum width or height of image
      */
     this.adjustImagesWidth = () => {
         if (!this.panel) {
@@ -257,6 +274,7 @@ function Menu(items,container,eventType=null) {
         if (!this.container) {
             return
         }
+        EventsManager.emit(MenuEvents.SHOW,this,{owner:this});
         this.drawMenu();
         if (!this.panel) {
             return
@@ -276,7 +294,6 @@ function Menu(items,container,eventType=null) {
             top = top - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
             this.panel.style.top = top +"px";
         }
-        EventsManager.emit(MenuEvents.SHOW,this);
     }
 
     /**
@@ -307,7 +324,10 @@ function Menu(items,container,eventType=null) {
      * @param id {string} ID of item to remove
      */
     this.removeItem = (id) => {
-        this.items.splice(this.items.findIndex(item => item.id === id),1);
+        const index = this.items.findIndex(item => item.id === id)
+        if (index !== -1) {
+            this.items.splice(index, 1);
+        }
     }
 
     /**
@@ -418,7 +438,7 @@ function Menu(items,container,eventType=null) {
             this.panel.innerHTML = "";
         }
         this.panel = null;
-        EventsManager.emit(MenuEvents.DESTROY,this);
+        EventsManager.emit(MenuEvents.DESTROY,this,{owner:this});
     }
 }
 
