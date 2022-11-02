@@ -23,8 +23,8 @@ function Menus() {
      * like `click`, `mouseover`, `mousedown` or others.
      * @returns {Menu} Constructed [Menu](#Menu) object.
      */
-    this.create = (items,container,eventName) => {
-        return new Menu(items,container,eventName).init();
+    this.create = (items,container,eventName="contextmenu",options={}) => {
+        return new Menu(items,container,eventName,options).init();
     }
 
     EventsManager.subscribe(MenuEvents.CREATE, (event) => {

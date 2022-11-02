@@ -13,7 +13,7 @@ import {createEvent} from "./functions.js";
  * (by default `contextmenu`, triggers when user do right mouse click on element)
  * @constructor
  */
-function Menu(items,container,eventType=null) {
+function Menu(items,container,eventType=null, options={}) {
     /**
      * Menu panel element
      * @type {HTMLDivElement}
@@ -41,6 +41,14 @@ function Menu(items,container,eventType=null) {
      * @type {string}
      */
     this.event = eventType || "contextmenu";
+
+    /**
+     * Additional options for context menu
+     * @param customHandler {function} Custom function, that will be triggered on menu
+     * display instead of original one. Function receives two arguments: `menu` with link to menu
+     * and `event` with context menu Mouse Event object
+     */
+    this.options = options;
 
     /**
      * @ignore
@@ -105,10 +113,11 @@ function Menu(items,container,eventType=null) {
      */
     this.init = () => {
         Object.assign(this,new StylesHelper(this));
-        this.container.addEventListener(this.event, (event) => {
+        this.listener = (event) => {
             this.onEvent(event);
             return false;
-        });
+        };
+        this.container.addEventListener(this.event, this.listener);
         EventsManager.emit(MenuEvents.CREATE,this,{owner:this});
         return this;
     }
@@ -119,6 +128,10 @@ function Menu(items,container,eventType=null) {
      * @param event {Event} Event object
      */
     this.onEvent = (event) => {
+        if (this.options.customHandler && typeof(this.options.customHandler === "function")) {
+            this.options.customHandler(this,event);
+            return
+        }
         this.origEvent = event;
         event.preventDefault();
         event.stopPropagation();
@@ -409,6 +422,9 @@ function Menu(items,container,eventType=null) {
             for (let handler of this.subscriptions[eventName]) {
                 EventsManager.unsubscribe(eventName,handler);
             }
+        }
+        if (this.container) {
+            this.container.removeEventListener(this.event, this.listener);
         }
         this.subscriptions = {};
         if (!this.panel) {
