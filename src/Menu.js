@@ -304,7 +304,7 @@ function Menu(items,container,eventType=null, options={}) {
             this.panel.style.left = left +"px";
         }
         if (this.origEvent && this.origEvent.clientY+this.panel.clientHeight > window.innerHeight) {
-            top = top - (window.innerHeight + this.panel.clientHeight-20) + this.origEvent.clientY;
+            top = window.innerHeight - this.panel.clientHeight - 10;
             this.panel.style.top = top +"px";
         }
     }
